@@ -52,7 +52,7 @@ async def q_put(request):
             {"success": False, "error": "/q called without a 'url' in form data"}
         )
 
-    task = BackgroundTask(download, url, options)
+    task = BackgroundTask(download, url, fileNameO, options)
 
     print("Added url " + url + " to the download queue")
 
@@ -82,7 +82,7 @@ def update():
         print(e.output)
 
 
-def get_ydl_options(request_options):
+def get_ydl_options(fileName,request_options):
     request_vars = {
         "YDL_EXTRACT_AUDIO_FORMAT": None,
         "YDL_RECODE_VIDEO_FORMAT": None,
@@ -117,18 +117,32 @@ def get_ydl_options(request_options):
                 "preferedformat": ydl_vars["YDL_RECODE_VIDEO_FORMAT"],
             }
         )
-
-    return {
+    #print("ydl_vars[YDL_OUTPUT_TEMPLATE:", ydl_vars["YDL_OUTPUT_TEMPLATE"])
+    if '.' in fileName:
+      import os
+      head, tail = os.path.split(ydl_vars["YDL_OUTPUT_TEMPLATE"])
+      output_tmpl = head + "/" + fileName
+      print("output_tmpl:",output_tmpl)
+      return {
+        "format": ydl_vars["YDL_FORMAT"],
+        "postprocessors": postprocessors,
+        "outtmpl": output_tmpl,
+        "download_archive": ydl_vars["YDL_ARCHIVE_FILE"],
+        "updatetime": ydl_vars["YDL_UPDATE_TIME"] == "True",
+      }
+    else:
+      print("output_tmpl:",output_tmpl)  
+      return {
         "format": ydl_vars["YDL_FORMAT"],
         "postprocessors": postprocessors,
         "outtmpl": ydl_vars["YDL_OUTPUT_TEMPLATE"],
         "download_archive": ydl_vars["YDL_ARCHIVE_FILE"],
         "updatetime": ydl_vars["YDL_UPDATE_TIME"] == "True",
-    }
+      }
 
 
-def download(url, request_options):
-    with YoutubeDL(get_ydl_options(request_options)) as ydl:
+def download(url,fileName, request_options):
+    with YoutubeDL(get_ydl_options(fileName,request_options)) as ydl:
         ydl.download([url])
 
 
@@ -143,3 +157,4 @@ app = Starlette(debug=True, routes=routes)
 
 print("Updating youtube-dl to the newest version")
 update()
+
