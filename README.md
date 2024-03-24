@@ -37,10 +37,10 @@ This is an example service definition that could be put in `docker-compose.yml`.
 If you have python ^3.6.0 installed in your PATH you can simply run like this, providing optional environment variable overrides inline.
 
 ```shell
-YDL_UPDATE_TIME=False python3 -m uvicorn youtube-dl-server:app --port 8123
+YDL_UPDATE_TIME=False YDL_OUTPUT_TEMPLATE="/path/to/save/%(title).200s.%(ext)s" python3 -m uvicorn youtube-dl-server:app --port 8123
 ```
 
-In this example, `YDL_UPDATE_TIME=False` is the same as the command line option `--no-mtime`.
+In this example, `YDL_UPDATE_TIME=False` is the same as the command line option `--no-mtime`. The `YDL_OUTPUT_TEMPLATE` defines the path to save the file. This template will also serve as the path when the `{{fileName}}` is defined when submitting the form.
 
 ## Usage
 

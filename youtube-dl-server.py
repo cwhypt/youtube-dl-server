@@ -44,6 +44,7 @@ async def redirect(request):
 async def q_put(request):
     form = await request.form()
     url = form.get("url").strip()
+    fileNameO = form.get("fileName").strip()
     ui = form.get("ui")
     options = {"format": form.get("format")}
 
